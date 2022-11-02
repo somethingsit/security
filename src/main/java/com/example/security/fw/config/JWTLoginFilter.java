@@ -1,7 +1,9 @@
 package com.example.security.fw.config;
 
+import com.example.security.fw.aop.CurrentUser;
 import com.example.security.model.AccountCredentials;
 import com.example.security.service.TokenAuthenticationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,10 +19,13 @@ import java.io.IOException;
 import java.util.Collections;
 
 public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
+
     public JWTLoginFilter(String url, AuthenticationManager authManager) {
         super(new AntPathRequestMatcher(url));
         setAuthenticationManager(authManager);
     }
+
+
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
@@ -38,6 +43,5 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         TokenAuthenticationService.addAuthentication(response, authResult.getName());
-
     }
 }

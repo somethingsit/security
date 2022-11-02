@@ -1,6 +1,6 @@
 package com.example.security.service;
 
-import com.example.security.model.User;
+import com.example.security.fw.aop.CurrentUser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,8 +16,8 @@ import static java.util.Collections.emptyList;
 
 @Service
 public class TokenAuthenticationService {
-    static final long EXPIRATIONTIME = 864_000_000; // 10 days
-    static final String SECRET = "ThisIsASecret";
+    static final long EXPIRATIONTIME = 400_000; // 10 days
+    static final String SECRET = "SECRET_3000";
     static final String TOKEN_PREFIX = "Bearer";
     static final String HEADER_STRING = "Authorization";
 
@@ -28,8 +28,7 @@ public class TokenAuthenticationService {
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
         res.addHeader(HEADER_STRING, TOKEN_PREFIX + " " + JWT);
-        String body = (TOKEN_PREFIX + " " + JWT);
-        res.getWriter().write(body);
+        res.getWriter().write(JWT);
         res.getWriter().flush();
     }
 
