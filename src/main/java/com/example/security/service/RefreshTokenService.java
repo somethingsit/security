@@ -1,5 +1,6 @@
 package com.example.security.service;
 
+import com.example.security.dto.TokenRefreshException;
 import com.example.security.model.RefreshToken;
 import com.example.security.repo.RefreshTokenRepo;
 import com.example.security.repo.UserRepo;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -20,6 +22,11 @@ public class RefreshTokenService {
         this.userRepo = userRepo;
     }
 
+    public Optional<RefreshToken> findByToken(String token) {
+        return refreshTokenRepo.findByToken(token);
+    }
+
+
     public RefreshToken createRefreshToken(String username) {
         RefreshToken refreshToken = new RefreshToken();
 
@@ -31,10 +38,10 @@ public class RefreshTokenService {
         return refreshToken;
     }
 
-    public RefreshToken verifyExpiration(RefreshToken token) throws Exception {
+    public RefreshToken verifyExpiration(RefreshToken token){
         if(token.getExpiryDate().compareTo(Instant.now()) < 0) {
             refreshTokenRepo.delete(token);
-            throw new Exception("Refresh token was expired");
+            throw new TokenRefreshException(token.getToken(), "Refresh token was expired. Please make a new signin request");
         }
         return token;
     }

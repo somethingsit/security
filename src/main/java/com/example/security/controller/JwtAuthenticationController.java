@@ -1,9 +1,6 @@
 package com.example.security.controller;
 
-import com.example.security.dto.JwtRequestDTO;
-import com.example.security.dto.JwtResponseDTO;
-import com.example.security.dto.RefreshRequestDTO;
-import com.example.security.dto.RefreshResponseDTO;
+import com.example.security.dto.*;
 import com.example.security.fw.config.JwtTokenUtil;
 import com.example.security.model.RefreshToken;
 import com.example.security.service.RefreshTokenService;
@@ -19,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Objects;
 
 @RestController
-@RequestMapping(value = "/api/v01")
+@RequestMapping(value = "/api/auth")
 public class JwtAuthenticationController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
@@ -48,14 +45,18 @@ public class JwtAuthenticationController {
     }
 
     @PostMapping(path = "/refreshToken")
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshRequestDTO refreshRequestDTO)  throws Exception {
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshRequestDTO refreshRequestDTO) {
         String refreshToken = refreshRequestDTO.getRefreshToken();
 
-        final UserDetails userDetails = userService.loadUserByUsername(null);
-
-        final String token = jwtTokenUtil.generateToken(userDetails);
-
-        return ResponseEntity.ok(new RefreshResponseDTO(token, refreshToken));
+        return refreshTokenService.findByToken(refreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser).map(user -> {
+                    //get userDetails
+                    UserDetails userDetails = userService.loadUserByUsername(user.getUsername());
+                    //get token
+                    String token = jwtTokenUtil.generateToken(userDetails);
+            return ResponseEntity.ok(new RefreshResponseDTO(token, refreshToken));
+        }).orElseThrow(() -> new TokenRefreshException(refreshToken, "Refresh token is not in database!"));
     }
 
     private void authenticate(String username, String password) throws Exception {

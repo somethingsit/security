@@ -1,6 +1,7 @@
 package com.example.security.fw.config;
 
 import com.example.security.service.UserService;
+import com.example.security.utils.Const;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static com.example.security.utils.Const.SECURE.SIGN_IN_URL;
+import static com.example.security.utils.Const.SECURE.*;
 
 @Configuration
 @EnableWebSecurity
@@ -48,7 +49,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
                 .antMatchers("/").permitAll() // Có nghĩa là request "/" ko cần phải đc xác thực
-                .antMatchers(HttpMethod.POST, SIGN_IN_URL).permitAll() // Request dạng POST tới "/login" luôn được phép truy cập dù là đã authenticated hay chưa
+                .antMatchers(HttpMethod.POST, NOT_AUTH_IN_URL).permitAll() // Request dạng POST tới "/login" luôn được phép truy cập dù là đã authenticated hay chưa
                 .anyRequest().authenticated() // Các request còn lại đều cần được authenticated
                 .and()
                 //
