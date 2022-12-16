@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:mariadb://45.124.94.141:3306/boots
-    username: hoangpv
-    password: hoangpv@789
-    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc: {xxx}
+    username: {xxx}
+    password: {xxx}
+    driver-class-name: {xxx}
   jpa:
     hibernate:
       ddl-auto: update
